@@ -17,9 +17,10 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning> {/* <-- 4. Menambahkan suppressHydrationWarning */}
       <body className={GeistSans.className}> {/* <-- 5. Menerapkan font dengan cara yang benar */}
-        <ThemeProvider // <-- 6. MEMBUNGKUS children dengan ThemeProvider (INI YANG PALING PENTING)
+        <ThemeProvider
           attribute="class"
-          defaultTheme="system"
+          defaultTheme="light"
+          forcedTheme="light"
           enableSystem
           disableTransitionOnChange
         >
