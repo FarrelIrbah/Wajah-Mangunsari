@@ -72,6 +72,13 @@ export default function AdminDashboard() {
     router.push("/")
   }
 
+  const handleDialogChange = (open: boolean) => {
+    setIsDialogOpen(open)
+    if (!open) {
+      setEditingItem(null)
+    }
+  }
+
   const handleDelete = async (table: string, id: number, name: string) => {
     Swal.fire({
       title: `Yakin ingin menghapus "${name}"?`,
@@ -220,12 +227,11 @@ export default function AdminDashboard() {
                   <h3 className="text-lg font-semibold">Taman & Kebun</h3>
                   <GardenDialog
                     isOpen={isDialogOpen}
-                    onOpenChange={setIsDialogOpen}
+                    onOpenChange={handleDialogChange}
                     editingItem={editingItem}
                     onSuccess={() => {
                       fetchData()
-                      setIsDialogOpen(false)
-                      setEditingItem(null)
+                      handleDialogChange(false)
                     }}
                   />
                 </div>
@@ -265,12 +271,11 @@ export default function AdminDashboard() {
                   <h3 className="text-lg font-semibold">UMKM</h3>
                   <UMKMDialog
                     isOpen={isDialogOpen}
-                    onOpenChange={setIsDialogOpen}
+                    onOpenChange={handleDialogChange}
                     editingItem={editingItem}
                     onSuccess={() => {
                       fetchData()
-                      setIsDialogOpen(false)
-                      setEditingItem(null)
+                      handleDialogChange(false)
                     }}
                   />
                 </div>
@@ -310,12 +315,11 @@ export default function AdminDashboard() {
                   <h3 className="text-lg font-semibold">Testimoni</h3>
                   <TestimonialDialog
                     isOpen={isDialogOpen}
-                    onOpenChange={setIsDialogOpen}
+                    onOpenChange={handleDialogChange}
                     editingItem={editingItem}
                     onSuccess={() => {
                       fetchData()
-                      setIsDialogOpen(false)
-                      setEditingItem(null)
+                      handleDialogChange(false)
                     }}
                   />
                 </div>
@@ -361,12 +365,11 @@ export default function AdminDashboard() {
                   <h3 className="text-lg font-semibold">Galeri</h3>
                   <GalleryDialog
                     isOpen={isDialogOpen}
-                    onOpenChange={setIsDialogOpen}
+                    onOpenChange={handleDialogChange}
                     editingItem={editingItem}
                     onSuccess={() => {
                       fetchData()
-                      setIsDialogOpen(false)
-                      setEditingItem(null)
+                      handleDialogChange(false)
                     }}
                   />
                 </div>
@@ -448,7 +451,8 @@ function GardenDialog({ isOpen, onOpenChange, editingItem, onSuccess }: any) {
         coordinates: "",
       })
     }
-  }, [editingItem])
+    setImageFiles(null);
+  }, [editingItem, isOpen])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -674,7 +678,8 @@ function UMKMDialog({ isOpen, onOpenChange, editingItem, onSuccess }: any) {
         coordinates: "",
       })
     }
-  }, [editingItem])
+    setImageFiles(null);
+  }, [editingItem, isOpen])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
