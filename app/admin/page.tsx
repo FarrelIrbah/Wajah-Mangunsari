@@ -15,6 +15,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Badge } from "@/components/ui/badge"
 import { Plus, Edit, Trash2, MapPin, Users, Camera, Heart, LogOut } from "lucide-react"
 import type { User } from "@supabase/supabase-js"
+import Swal from "sweetalert2"
 
 export default function AdminDashboard() {
   const [user, setUser] = useState<User | null>(null)
@@ -70,17 +71,43 @@ export default function AdminDashboard() {
     router.push("/")
   }
 
-  const handleDelete = async (table: string, id: number) => {
-    if (!confirm("Apakah Anda yakin ingin menghapus item ini?")) return
-
-    try {
-      const { error } = await supabase.from(table).delete().eq("id", id)
-      if (error) throw error
-      fetchData()
-    } catch (error) {
-      console.error("Error deleting:", error)
-      alert("Gagal menghapus data")
-    }
+  const handleDelete = async (table: string, id: number, name: string) => {
+    Swal.fire({
+      title: `Yakin ingin menghapus "${name}"?`,
+      text: "Data yang sudah dihapus tidak dapat dikembalikan!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Ya, hapus!',
+      cancelButtonText: 'Batal',
+      // Untuk theming dark mode (opsional)
+      customClass: {
+        popup: 'bg-white dark:bg-gray-800 rounded-lg',
+        title: 'text-gray-900 dark:text-white',
+        htmlContainer: 'text-gray-600 dark:text-gray-300',
+      }
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          const { error } = await supabase.from(table).delete().eq("id", id)
+          if (error) throw error
+          
+          Swal.fire(
+            'Dihapus!',
+            'Data telah berhasil dihapus.',
+            'success'
+          );
+          fetchData(); // Panggil ulang fetchData untuk refresh data
+        } catch (error: any) {
+          Swal.fire(
+            'Gagal!',
+            `Terjadi kesalahan: ${error.message}`,
+            'error'
+          );
+        }
+      }
+    })
   }
 
   if (loading) {
@@ -218,7 +245,7 @@ export default function AdminDashboard() {
                             >
                               <Edit className="w-3 h-3" />
                             </Button>
-                            <Button size="sm" variant="outline" onClick={() => handleDelete("gardens", garden.id)}>
+                            <Button size="sm" variant="outline" onClick={() => handleDelete("gardens", garden.id, garden.name)}>
                               <Trash2 className="w-3 h-3" />
                             </Button>
                           </div>
@@ -263,7 +290,7 @@ export default function AdminDashboard() {
                             >
                               <Edit className="w-3 h-3" />
                             </Button>
-                            <Button size="sm" variant="outline" onClick={() => handleDelete("umkm", item.id)}>
+                            <Button size="sm" variant="outline" onClick={() => handleDelete("umkm", item.id, item.name)}>
                               <Trash2 className="w-3 h-3" />
                             </Button>
                           </div>
@@ -314,7 +341,7 @@ export default function AdminDashboard() {
                             <Button
                               size="sm"
                               variant="outline"
-                              onClick={() => handleDelete("testimonials", testimonial.id)}
+                              onClick={() => handleDelete("testimonials", testimonial.id, testimonial.name)}
                             >
                               <Trash2 className="w-3 h-3" />
                             </Button>
@@ -359,7 +386,7 @@ export default function AdminDashboard() {
                             >
                               <Edit className="w-3 h-3" />
                             </Button>
-                            <Button size="sm" variant="outline" onClick={() => handleDelete("gallery", item.id)}>
+                            <Button size="sm" variant="outline" onClick={() => handleDelete("gallery", item.id, item.title)}>
                               <Trash2 className="w-3 h-3" />
                             </Button>
                           </div>
