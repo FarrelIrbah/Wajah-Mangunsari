@@ -16,6 +16,7 @@ import { Badge } from "@/components/ui/badge"
 import { Plus, Edit, Trash2, MapPin, Users, Camera, Heart, LogOut } from "lucide-react"
 import type { User } from "@supabase/supabase-js"
 import Swal from "sweetalert2"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 export default function AdminDashboard() {
   const [user, setUser] = useState<User | null>(null)
@@ -502,12 +503,20 @@ function GardenDialog({ isOpen, onOpenChange, editingItem, onSuccess }: any) {
             </div>
             <div>
               <Label htmlFor="location">Lokasi</Label>
-              <Input
-                id="location"
+              <Select
                 value={formData.location}
-                onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+                onValueChange={(value) => setFormData({ ...formData, location: value })}
                 required
-              />
+              >
+                <SelectTrigger id="location">
+                  <SelectValue placeholder="Pilih RT" />
+                </SelectTrigger>
+                <SelectContent>
+                  {['RT 01', 'RT 02', 'RT 03', 'RT 04', 'RT 05', 'RT 06', 'RT 07'].map(rt => (
+                    <SelectItem key={rt} value={rt}>{rt}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
           <div>
@@ -685,12 +694,20 @@ function UMKMDialog({ isOpen, onOpenChange, editingItem, onSuccess }: any) {
             </div>
             <div>
               <Label htmlFor="category">Kategori</Label>
-              <Input
-                id="category"
+              <Select
                 value={formData.category}
-                onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                onValueChange={(value) => setFormData({ ...formData, category: value })}
                 required
-              />
+              >
+                <SelectTrigger id="category">
+                  <SelectValue placeholder="Pilih Kategori" />
+                </SelectTrigger>
+                <SelectContent>
+                  {['Kuliner', 'Kerajinan', 'Jasa', 'Fashion', 'Agrobisnis'].map(cat => (
+                    <SelectItem key={cat} value={cat}>{cat}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
           <div>

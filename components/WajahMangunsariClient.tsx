@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo } from "react"
 import { motion, useScroll, useTransform } from "framer-motion"
-import { Menu, X, MapPin, Leaf, Users, Heart, Camera, Mail, Phone, Instagram, Facebook, Clock, DollarSign, ChevronLeft, ChevronRight } from "lucide-react"
+import { Menu, X, MapPin, Leaf, Users, Heart, Camera, Mail, Phone, Instagram, Facebook, Clock, DollarSign, ChevronLeft, ChevronRight, List, Home, UtensilsCrossed, Palette, Wrench, Shirt, Carrot } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
@@ -82,6 +82,26 @@ const prokLimTimeline = [
     { year: "2024", title: "Persiapan Verifikasi", description: "Mempersiapkan dokumentasi dan evaluasi untuk verifikasi PROKLIM", },
 ]
 
+const rtFilters = [
+    { name: 'Semua', icon: List },
+    { name: 'RT 01', icon: Home },
+    { name: 'RT 02', icon: Home },
+    { name: 'RT 03', icon: Home },
+    { name: 'RT 04', icon: Home },
+    { name: 'RT 05', icon: Home },
+    { name: 'RT 06', icon: Home },
+    { name: 'RT 07', icon: Home },
+  ]
+  
+  const categoryFilters = [
+    { name: 'Semua', icon: List },
+    { name: 'Kuliner', icon: UtensilsCrossed },
+    { name: 'Kerajinan', icon: Palette },
+    { name: 'Jasa', icon: Wrench },
+    { name: 'Fashion', icon: Shirt },
+    { name: 'Agrobisnis', icon: Carrot },
+  ]
+
 interface WajahMangunsariProps {
   initialGardens: Garden[];
   initialUmkm: UMKM[];
@@ -101,6 +121,8 @@ export default function WajahMangunsariClient({ initialGardens, initialUmkm, ini
   const [gallery, setGallery] = useState<GalleryItem[]>(initialGallery)
   const [loading, setLoading] = useState(false)
 
+  const [selectedRt, setSelectedRt] = useState('Semua')
+  const [selectedCategory, setSelectedCategory] = useState('Semua')
   const [leafletIcons, setLeafletIcons] = useState<{ greenIcon: L.Icon | null, yellowIcon: L.Icon | null }>({ greenIcon: null, yellowIcon: null });
 
   useEffect(() => {
@@ -133,6 +155,14 @@ export default function WajahMangunsariClient({ initialGardens, initialUmkm, ini
       return () => window.removeEventListener("scroll", handleScroll)
     }
   }, [])
+
+  const filteredGardens = gardens.filter(garden => 
+    selectedRt === 'Semua' ? true : garden.location === selectedRt
+  );
+
+  const filteredUmkm = umkm.filter(item =>
+    selectedCategory === 'Semua' ? true : item.category === selectedCategory
+  );
 
   return (
     <div className="min-h-screen bg-white">
@@ -411,6 +441,20 @@ export default function WajahMangunsariClient({ initialGardens, initialUmkm, ini
           </p>
         </motion.div>
 
+        <div className="flex flex-wrap justify-center gap-2 mb-12">
+            {rtFilters.map((filter) => (
+            <Button
+                key={filter.name}
+                variant={selectedRt === filter.name ? 'default' : 'outline'}
+                onClick={() => setSelectedRt(filter.name)}
+                className="transition-all duration-200"
+            >
+                <filter.icon className="w-4 h-4 mr-2" />
+                {filter.name}
+            </Button>
+            ))}
+        </div>
+
         {loading ? (
           <div className="text-center py-12">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-500 mx-auto mb-4"></div>
@@ -531,6 +575,20 @@ export default function WajahMangunsariClient({ initialGardens, initialUmkm, ini
               Denyut nadi ekonomi yang selaras dengan nilai-nilai kelestarian lingkungan
             </p>
           </motion.div>
+
+          <div className="flex flex-wrap justify-center gap-2 mb-12">
+            {categoryFilters.map((filter) => (
+            <Button
+                key={filter.name}
+                variant={selectedCategory === filter.name ? 'default' : 'outline'}
+                onClick={() => setSelectedCategory(filter.name)}
+                className="transition-all duration-200"
+            >
+                <filter.icon className="w-4 h-4 mr-2" />
+                {filter.name}
+            </Button>
+            ))}
+          </div>
 
           {loading ? (
             <div className="text-center py-12">
