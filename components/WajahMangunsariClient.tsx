@@ -2,23 +2,7 @@
 
 import { useState, useEffect, useMemo } from "react"
 import { motion, useScroll, useTransform } from "framer-motion"
-import {
-  Menu,
-  X,
-  MapPin,
-  Leaf,
-  Users,
-  Heart,
-  Camera,
-  Mail,
-  Phone,
-  Instagram,
-  Facebook,
-  Clock,
-  DollarSign,
-  ChevronLeft,
-  ChevronRight,
-} from "lucide-react"
+import { Menu, X, MapPin, Leaf, Users, Heart, Camera, Mail, Phone, Instagram, Facebook, Clock, DollarSign, ChevronLeft, ChevronRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
@@ -28,8 +12,8 @@ import { Badge } from "@/components/ui/badge"
 import Image from "next/image"
 import dynamic from "next/dynamic"
 import { AuthButton } from "@/components/AuthButton"
-import { supabase, type Garden, type UMKM, type Testimonial, type GalleryItem } from "@/lib/supabase"
-import L from 'leaflet';
+import { type Garden, type UMKM, type Testimonial, type GalleryItem } from "@/lib/supabase"
+import type L from 'leaflet'
 
 // Dynamically import Leaflet to avoid SSR issues
 const MapContainer = dynamic(() => import("react-leaflet").then((mod) => mod.MapContainer), { ssr: false })
@@ -89,36 +73,15 @@ const ImageCarousel = ({ images, alt }: { images: string[]; alt: string }) => {
   )
 }
 
-// PROKLIM timeline data with explanation
+// PROKLIM timeline data
 const prokLimTimeline = [
-  {
-    year: "2020",
-    title: "Inisiasi Program",
-    description: "Mulai menerapkan prinsip-prinsip ramah lingkungan dalam kehidupan sehari-hari",
-  },
-  {
-    year: "2021",
-    title: "Pembentukan Tim",
-    description: "Membentuk tim PROKLIM dan mulai sosialisasi kepada warga",
-  },
-  {
-    year: "2022",
-    title: "Implementasi Aksi",
-    description: "Memulai program pengelolaan sampah, pembuatan biopori, dan penghijauan",
-  },
-  {
-    year: "2023",
-    title: "Pengembangan",
-    description: "Memperluas program dengan taman komunal dan UMKM ramah lingkungan",
-  },
-  {
-    year: "2024",
-    title: "Persiapan Verifikasi",
-    description: "Mempersiapkan dokumentasi dan evaluasi untuk verifikasi PROKLIM",
-  },
+    { year: "2020", title: "Inisiasi Program", description: "Mulai menerapkan prinsip-prinsip ramah lingkungan", },
+    { year: "2021", title: "Pembentukan Tim", description: "Membentuk tim PROKLIM dan mulai sosialisasi kepada warga", },
+    { year: "2022", title: "Implementasi Aksi", description: "Memulai program pengelolaan sampah, pembuatan biopori, dan penghijauan", },
+    { year: "2023", title: "Pengembangan", description: "Memperluas program dengan taman komunal dan UMKM ramah lingkungan", },
+    { year: "2024", title: "Persiapan Verifikasi", description: "Mempersiapkan dokumentasi dan evaluasi untuk verifikasi PROKLIM", },
 ]
 
-// Definisikan tipe props untuk komponen ini
 interface WajahMangunsariProps {
   initialGardens: Garden[];
   initialUmkm: UMKM[];
@@ -126,34 +89,22 @@ interface WajahMangunsariProps {
   initialGallery: GalleryItem[];
 }
 
-// Definisikan tipe props untuk komponen ini
-interface WajahMangunsariProps {
-    initialGardens: Garden[];
-    initialUmkm: UMKM[];
-    initialTestimonials: Testimonial[];
-    initialGallery: GalleryItem[];
-  }
-  
-    export default function WajahMangunsariClient({
-    initialGardens,
-    initialUmkm,
-    initialTestimonials,
-    initialGallery,
-  }: WajahMangunsariProps) {
-    const [isMenuOpen, setIsMenuOpen] = useState(false)
-    const [isScrolled, setIsScrolled] = useState(false)
-    const { scrollY } = useScroll()
-    const heroY = useTransform(scrollY, [0, 500], [0, 150])
-  
-    // Inisialisasi state dengan data dari props
-    const [gardens, setGardens] = useState<Garden[]>(initialGardens)
-    const [umkm, setUmkm] = useState<UMKM[]>(initialUmkm)
-    const [testimonials, setTestimonials] = useState<Testimonial[]>(initialTestimonials)
-    const [gallery, setGallery] = useState<GalleryItem[]>(initialGallery)
-    const [loading, setLoading] = useState(false) // Default false karena data sudah ada
-  
-    // Pindahkan deklarasi ikon ke dalam komponen dengan useMemo
-    const { greenIcon, yellowIcon } = useMemo(() => {
+export default function WajahMangunsariClient({ initialGardens, initialUmkm, initialTestimonials, initialGallery }: WajahMangunsariProps) {
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [isScrolled, setIsScrolled] = useState(false)
+  const { scrollY } = useScroll()
+  const heroY = useTransform(scrollY, [0, 500], [0, 150])
+
+  const [gardens, setGardens] = useState<Garden[]>(initialGardens)
+  const [umkm, setUmkm] = useState<UMKM[]>(initialUmkm)
+  const [testimonials, setTestimonials] = useState<Testimonial[]>(initialTestimonials)
+  const [gallery, setGallery] = useState<GalleryItem[]>(initialGallery)
+  const [loading, setLoading] = useState(false)
+
+  const [leafletIcons, setLeafletIcons] = useState<{ greenIcon: L.Icon | null, yellowIcon: L.Icon | null }>({ greenIcon: null, yellowIcon: null });
+
+  useEffect(() => {
+    import('leaflet').then(L => {
       const greenIcon = new L.Icon({
         iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
         shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
@@ -164,24 +115,24 @@ interface WajahMangunsariProps {
         shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
         iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34], shadowSize: [41, 41]
       });
-      return { greenIcon, yellowIcon };
-    }, []);
-  
-    // Pindahkan fungsi smoothScrollTo ke dalam komponen
-    const smoothScrollTo = (elementId: string) => {
-      const element = document.getElementById(elementId)
-      if (element) {
-        element.scrollIntoView({ behavior: "smooth", block: "start" })
-      }
+      setLeafletIcons({ greenIcon, yellowIcon });
+    });
+  }, []);
+
+  const smoothScrollTo = (elementId: string) => {
+    const element = document.getElementById(elementId)
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth", block: "start" })
     }
-  
-    useEffect(() => {
-      const handleScroll = () => {
-        setIsScrolled(window.scrollY > 50)
-      }
+  }
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const handleScroll = () => { setIsScrolled(window.scrollY > 50) }
       window.addEventListener("scroll", handleScroll)
       return () => window.removeEventListener("scroll", handleScroll)
-    }, [])
+    }
+  }, [])
 
   return (
     <div className="min-h-screen bg-white">
@@ -696,57 +647,90 @@ interface WajahMangunsariProps {
       </section>
 
       {/* Section 6: Interactive Map (VERSI FINAL YANG DIPERBAIKI) */}
-      <section id="peta" className="py-20 px-4 max-w-7xl mx-auto">
-                <motion.div initial={{ opacity: 0, y: 50 }} whileInView={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }} viewport={{ once: true }} className="text-center mb-16">
-                    <h2 className="text-4xl md:text-5xl font-bold text-gray-800 mb-6">Jelajahi Kami: Peta Digital Mangunsari</h2>
-                    <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-8">Temukan lokasi taman dan UMKM kami melalui peta interaktif RW 01 Kelurahan Mangunsari</p>
-                    <div className="bg-green-50 p-6 rounded-xl mb-8"><p className="text-gray-700 leading-relaxed">RW 01 Mangunsari terletak di jantung Kelurahan Mangunsari, Kecamatan Gunungpati, Kota Semarang. Wilayah kami dikelilingi oleh perbukitan hijau yang asri, dengan akses mudah ke pusat kota. Setiap titik hijau pada peta menunjukkan lokasi taman komunal, sedangkan titik kuning menandai UMKM lokal yang menjadi kebanggaan warga kami.</p></div>
-                </motion.div>
-                <div className="bg-gray-100 rounded-2xl overflow-hidden shadow-lg">
-                    <div className="h-96 relative">
-                        {typeof window !== "undefined" && (
-                            <MapContainer center={[-7.054, 110.378]} zoom={16} style={{ height: "100%", width: "100%" }} className="rounded-2xl">
-                                <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors' />
+        <section id="peta" className="py-20 px-4 max-w-7xl mx-auto">
+        <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="text-center mb-16"
+        >
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-800 mb-6">Jelajahi Kami: Peta Digital Mangunsari</h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-8">
+            Temukan lokasi taman dan UMKM kami melalui peta interaktif RW 01 Kelurahan Mangunsari
+            </p>
+            <div className="bg-green-50 p-6 rounded-xl mb-8">
+            <p className="text-gray-700 leading-relaxed">
+                RW 01 Mangunsari terletak di jantung Kelurahan Mangunsari, Kecamatan Gunungpati, Kota Semarang. Wilayah kami dikelilingi oleh perbukitan hijau yang asri, dengan akses mudah ke pusat kota. Setiap titik hijau pada peta menunjukkan lokasi taman komunal, sedangkan titik kuning menandai UMKM lokal yang menjadi kebanggaan warga kami.
+            </p>
+            </div>
+        </motion.div>
 
-                                {/* Garden markers dengan filter pengaman dan ikon kustom */}
-                                {gardens
-                                    .filter(garden => garden.coordinates && garden.coordinates.length === 2)
-                                    .map((garden) => (
-                                        <Marker key={`garden-${garden.id}`} position={garden.coordinates as [number, number]} icon={greenIcon}>
-                                            <Popup>
-                                                <div className="p-1 max-w-[200px]">
-                                                    <h3 className="font-bold text-green-600 text-base mb-1">{garden.name}</h3>
-                                                    <p className="text-xs text-gray-500">{garden.address}</p>
-                                                </div>
-                                            </Popup>
-                                        </Marker>
-                                    ))}
+        <div className="bg-gray-100 rounded-2xl overflow-hidden shadow-lg">
+            <div className="h-96 relative">
+            {/* Perbaikan: Tampilkan loading jika ikon belum siap, lalu tampilkan peta jika sudah siap */}
+            {leafletIcons.greenIcon && leafletIcons.yellowIcon ? (
+                <MapContainer
+                center={[-7.054, 110.378]}
+                zoom={16}
+                style={{ height: "100%", width: "100%" }}
+                className="rounded-2xl"
+                >
+                <TileLayer
+                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                />
 
-                                {/* UMKM markers dengan filter pengaman dan ikon kustom */}
-                                {umkm
-                                    .filter(item => item.coordinates && item.coordinates.length === 2)
-                                    .map((item) => (
-                                        <Marker key={`umkm-${item.id}`} position={item.coordinates as [number, number]} icon={yellowIcon}>
-                                            <Popup>
-                                                <div className="p-1 max-w-[200px]">
-                                                    <h3 className="font-bold text-amber-600 text-base mb-1">{item.name}</h3>
-                                                    <p className="text-xs text-gray-500 mb-1">{item.address}</p>
-                                                    <p className="text-xs text-green-600 font-semibold">{item.price_range}</p>
-                                                </div>
-                                            </Popup>
-                                        </Marker>
-                                    ))}
-                            </MapContainer>
-                        )}
-                    </div>
-                    <div className="p-6 bg-white">
-                        <div className="flex flex-wrap justify-center gap-4">
-                            <div className="flex items-center"><div className="w-4 h-4 rounded-full mr-2" style={{ backgroundColor: '#28a745' }}></div><span className="text-sm text-gray-600">Taman & Kebun</span></div>
-                            <div className="flex items-center"><div className="w-4 h-4 rounded-full mr-2" style={{ backgroundColor: '#ffc107' }}></div><span className="text-sm text-gray-600">UMKM Lokal</span></div>
+                {/* Garden markers dengan filter pengaman dan ikon kustom */}
+                {gardens
+                    .filter(garden => garden.coordinates && garden.coordinates.length === 2)
+                    .map((garden) => (
+                    <Marker key={`garden-${garden.id}`} position={garden.coordinates as [number, number]} icon={leafletIcons.greenIcon!}>
+                        <Popup>
+                        <div className="p-1 max-w-[200px]">
+                            <h3 className="font-bold text-green-600 text-base mb-1">{garden.name}</h3>
+                            <p className="text-xs text-gray-500">{garden.address}</p>
                         </div>
-                    </div>
+                        </Popup>
+                    </Marker>
+                    ))}
+
+                {/* UMKM markers dengan filter pengaman dan ikon kustom */}
+                {umkm
+                    .filter(item => item.coordinates && item.coordinates.length === 2)
+                    .map((item) => (
+                    <Marker key={`umkm-${item.id}`} position={item.coordinates as [number, number]} icon={leafletIcons.yellowIcon!}>
+                        <Popup>
+                        <div className="p-1 max-w-[200px]">
+                            <h3 className="font-bold text-amber-600 text-base mb-1">{item.name}</h3>
+                            <p className="text-xs text-gray-500 mb-1">{item.address}</p>
+                            <p className="text-xs text-green-600 font-semibold">{item.price_range}</p>
+                        </div>
+                        </Popup>
+                    </Marker>
+                    ))}
+                </MapContainer>
+            ) : (
+                <div className="flex items-center justify-center h-full w-full">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-500"></div>
+                    <p className="ml-4 text-gray-600">Memuat peta...</p>
                 </div>
-            </section>
+            )}
+            </div>
+            <div className="p-6 bg-white">
+            <div className="flex flex-wrap justify-center gap-4">
+                <div className="flex items-center">
+                <div className="w-4 h-4 rounded-full mr-2" style={{ backgroundColor: '#28a745' }}></div>
+                <span className="text-sm text-gray-600">Taman & Kebun</span>
+                </div>
+                <div className="flex items-center">
+                <div className="w-4 h-4 rounded-full mr-2" style={{ backgroundColor: '#ffc107' }}></div>
+                <span className="text-sm text-gray-600">UMKM Lokal</span>
+                </div>
+            </div>
+            </div>
+        </div>
+        </section>
 
       {/* Section 7: Perjalanan PROKLIM */}
       <section id="proklim" className="py-20 bg-gray-50">
