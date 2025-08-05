@@ -56,17 +56,6 @@ const yellowIcon = new L.Icon({
   shadowSize: [41, 41]
 });
 
-// Smooth scroll function
-const smoothScrollTo = (elementId: string) => {
-  const element = document.getElementById(elementId)
-  if (element) {
-    element.scrollIntoView({
-      behavior: "smooth",
-      block: "start",
-    })
-  }
-}
-
 // Carousel component
 const ImageCarousel = ({ images, alt }: { images: string[]; alt: string }) => {
   const [currentIndex, setCurrentIndex] = useState(0)
@@ -160,6 +149,17 @@ export default function WajahMangunsari() {
   const [testimonials, setTestimonials] = useState<Testimonial[]>([])
   const [gallery, setGallery] = useState<GalleryItem[]>([])
   const [loading, setLoading] = useState(true)
+  
+  // Smooth scroll function
+  const smoothScrollTo = (elementId: string) => {
+    const element = document.getElementById(elementId)
+    if (element) {
+      element.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      })
+    }
+  }
 
   useEffect(() => {
     const handleScroll = () => {
