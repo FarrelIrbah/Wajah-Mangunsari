@@ -420,6 +420,8 @@ function GardenDialog({ isOpen, onOpenChange, editingItem, onSuccess }: any) {
     coordinates: "",
   })
 
+  const [imageFiles, setImageFiles] = useState<FileList | null>(null);
+
   useEffect(() => {
     if (editingItem) {
       setFormData({
@@ -451,19 +453,37 @@ function GardenDialog({ isOpen, onOpenChange, editingItem, onSuccess }: any) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    const data = {
-      name: formData.name,
-      description: formData.description,
-      location: formData.location,
-      contact: formData.contact,
-      address: formData.address,
-      hours: formData.hours,
-      features: formData.features.split(",").map((s) => s.trim()),
-      images: formData.images.split(",").map((s) => s.trim()),
-      coordinates: formData.coordinates.split(",").map((s) => Number.parseFloat(s.trim())),
-    }
-
     try {
+      let imageUrls: string[] = [];
+      
+      // Jika ada file baru yang dipilih, unggah dulu
+      if (imageFiles && imageFiles.length > 0) {
+        for (let i = 0; i < imageFiles.length; i++) {
+          const file = imageFiles[i];
+          const filePath = `public/gardens/${Date.now()}-${i}-${file.name}`;
+          const { error: uploadError } = await supabase.storage.from('website-assets').upload(filePath, file);
+          if (uploadError) throw uploadError;
+          
+          const { data: { publicUrl } } = supabase.storage.from('website-assets').getPublicUrl(filePath);
+          imageUrls.push(publicUrl);
+        }
+      } else if (formData.images) {
+        // Jika tidak ada file baru, gunakan URL yang sudah ada
+        imageUrls = formData.images.split(",").map((s) => s.trim()).filter(s => s);
+      }
+
+      const data = {
+        name: formData.name,
+        description: formData.description,
+        location: formData.location,
+        contact: formData.contact,
+        address: formData.address,
+        hours: formData.hours,
+        features: formData.features.split(",").map((s) => s.trim()).filter(s => s),
+        images: imageUrls,
+        coordinates: formData.coordinates.split(",").map((s) => Number.parseFloat(s.trim())).filter(n => !isNaN(n)),
+      }
+
       if (editingItem) {
         const { error } = await supabase.from("gardens").update(data).eq("id", editingItem.id)
         if (error) throw error
@@ -471,10 +491,24 @@ function GardenDialog({ isOpen, onOpenChange, editingItem, onSuccess }: any) {
         const { error } = await supabase.from("gardens").insert([data])
         if (error) throw error
       }
+      
+      Swal.fire({
+        title: 'Berhasil!',
+        text: editingItem ? 'Data taman berhasil diperbarui.' : 'Data taman berhasil ditambahkan.',
+        icon: 'success',
+        confirmButtonColor: '#28a745',
+        confirmButtonText: 'OK'
+      })
       onSuccess()
     } catch (error) {
       console.error("Error saving garden:", error)
-      alert("Gagal menyimpan data")
+      Swal.fire({
+        title: 'Gagal!',
+        text: 'Terjadi kesalahan saat menyimpan data taman.',
+        icon: 'error',
+        confirmButtonColor: '#d33',
+        confirmButtonText: 'OK'
+      })
     }
   }
 
@@ -567,13 +601,15 @@ function GardenDialog({ isOpen, onOpenChange, editingItem, onSuccess }: any) {
             />
           </div>
           <div>
-            <Label htmlFor="images">URL Gambar (pisahkan dengan koma)</Label>
+            <Label htmlFor="images">Unggah Gambar (bisa pilih lebih dari satu)</Label>
             <Input
               id="images"
-              value={formData.images}
-              onChange={(e) => setFormData({ ...formData, images: e.target.value })}
-              placeholder="/placeholder.svg, /image2.jpg"
+              type="file"
+              multiple // <-- Memungkinkan memilih banyak file
+              accept="image/jpeg, image/png, image/webp, image/gif, image/svg+xml" // <-- Tipe file yang diizinkan
+              onChange={(e) => setImageFiles(e.target.files)}
             />
+            <p className="text-sm text-gray-500 mt-1">URL yang sudah ada: {formData.images || 'Belum ada'}</p>
           </div>
           <div>
             <Label htmlFor="coordinates">Koordinat (lat, lng)</Label>
@@ -608,6 +644,8 @@ function UMKMDialog({ isOpen, onOpenChange, editingItem, onSuccess }: any) {
     coordinates: "",
   })
 
+  const [imageFiles, setImageFiles] = useState<FileList | null>(null);
+
   useEffect(() => {
     if (editingItem) {
       setFormData({
@@ -641,20 +679,38 @@ function UMKMDialog({ isOpen, onOpenChange, editingItem, onSuccess }: any) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    const data = {
-      name: formData.name,
-      description: formData.description,
-      category: formData.category,
-      contact: formData.contact,
-      address: formData.address,
-      hours: formData.hours,
-      price_range: formData.price_range,
-      products: formData.products.split(",").map((s) => s.trim()),
-      images: formData.images.split(",").map((s) => s.trim()),
-      coordinates: formData.coordinates.split(",").map((s) => Number.parseFloat(s.trim())),
-    }
-
     try {
+      let imageUrls: string[] = [];
+      
+      // Jika ada file baru yang dipilih, unggah dulu
+      if (imageFiles && imageFiles.length > 0) {
+        for (let i = 0; i < imageFiles.length; i++) {
+          const file = imageFiles[i];
+          const filePath = `public/umkm/${Date.now()}-${i}-${file.name}`;
+          const { error: uploadError } = await supabase.storage.from('website-assets').upload(filePath, file);
+          if (uploadError) throw uploadError;
+          
+          const { data: { publicUrl } } = supabase.storage.from('website-assets').getPublicUrl(filePath);
+          imageUrls.push(publicUrl);
+        }
+      } else if (formData.images) {
+        // Jika tidak ada file baru, gunakan URL yang sudah ada
+        imageUrls = formData.images.split(",").map((s) => s.trim()).filter(s => s);
+      }
+
+      const data = {
+        name: formData.name,
+        description: formData.description,
+        category: formData.category,
+        contact: formData.contact,
+        address: formData.address,
+        hours: formData.hours,
+        price_range: formData.price_range,
+        products: formData.products.split(",").map((s) => s.trim()).filter(s => s),
+        images: imageUrls,
+        coordinates: formData.coordinates.split(",").map((s) => Number.parseFloat(s.trim())).filter(n => !isNaN(n)),
+      }
+
       if (editingItem) {
         const { error } = await supabase.from("umkm").update(data).eq("id", editingItem.id)
         if (error) throw error
@@ -662,10 +718,24 @@ function UMKMDialog({ isOpen, onOpenChange, editingItem, onSuccess }: any) {
         const { error } = await supabase.from("umkm").insert([data])
         if (error) throw error
       }
+      
+      Swal.fire({
+        title: 'Berhasil!',
+        text: editingItem ? 'Data UMKM berhasil diperbarui.' : 'Data UMKM berhasil ditambahkan.',
+        icon: 'success',
+        confirmButtonColor: '#28a745',
+        confirmButtonText: 'OK'
+      })
       onSuccess()
     } catch (error) {
       console.error("Error saving UMKM:", error)
-      alert("Gagal menyimpan data")
+      Swal.fire({
+        title: 'Gagal!',
+        text: 'Terjadi kesalahan saat menyimpan data UMKM.',
+        icon: 'error',
+        confirmButtonColor: '#d33',
+        confirmButtonText: 'OK'
+      })
     }
   }
 
@@ -769,13 +839,15 @@ function UMKMDialog({ isOpen, onOpenChange, editingItem, onSuccess }: any) {
             />
           </div>
           <div>
-            <Label htmlFor="images">URL Gambar (pisahkan dengan koma)</Label>
+            <Label htmlFor="images">Unggah Gambar (bisa pilih lebih dari satu)</Label>
             <Input
               id="images"
-              value={formData.images}
-              onChange={(e) => setFormData({ ...formData, images: e.target.value })}
-              placeholder="/placeholder.svg, /image2.jpg"
+              type="file"
+              multiple
+              accept="image/jpeg, image/png, image/webp, image/gif, image/svg+xml"
+              onChange={(e) => setImageFiles(e.target.files)}
             />
+            <p className="text-sm text-gray-500 mt-1">URL yang sudah ada: {formData.images || 'Belum ada'}</p>
           </div>
           <div>
             <Label htmlFor="coordinates">Koordinat (lat, lng)</Label>
@@ -801,8 +873,10 @@ function TestimonialDialog({ isOpen, onOpenChange, editingItem, onSuccess }: any
     name: "",
     role: "",
     quote: "",
-    image: "",
   })
+
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [existingImageUrl, setExistingImageUrl] = useState<string | null>(null);
 
   useEffect(() => {
     if (editingItem) {
@@ -810,33 +884,57 @@ function TestimonialDialog({ isOpen, onOpenChange, editingItem, onSuccess }: any
         name: editingItem.name || "",
         role: editingItem.role || "",
         quote: editingItem.quote || "",
-        image: editingItem.image || "",
       })
+      setExistingImageUrl(editingItem.image || null);
     } else {
-      setFormData({
-        name: "",
-        role: "",
-        quote: "",
-        image: "",
-      })
+      setFormData({ name: "", role: "", quote: "" })
+      setExistingImageUrl(null);
     }
-  }, [editingItem])
+    setImageFile(null);
+  }, [editingItem, isOpen]) // Gunakan isOpen agar form di-reset setiap dibuka
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-
     try {
+      let imageUrl = existingImageUrl;
+
+      // Jika ada file baru yang dipilih, unggah dulu
+      if (imageFile) {
+        const filePath = `public/testimonials/${Date.now()}-${imageFile.name}`;
+        const { error: uploadError } = await supabase.storage.from('website-assets').upload(filePath, imageFile);
+        if (uploadError) throw uploadError;
+        
+        const { data: { publicUrl } } = supabase.storage.from('website-assets').getPublicUrl(filePath);
+        imageUrl = publicUrl;
+      }
+
+      const dataToSubmit = { ...formData, image: imageUrl };
+
       if (editingItem) {
-        const { error } = await supabase.from("testimonials").update(formData).eq("id", editingItem.id)
+        const { error } = await supabase.from("testimonials").update(dataToSubmit).eq("id", editingItem.id)
         if (error) throw error
       } else {
-        const { error } = await supabase.from("testimonials").insert([formData])
+        const { error } = await supabase.from("testimonials").insert([dataToSubmit])
         if (error) throw error
       }
+      
+      Swal.fire({
+        title: 'Berhasil!',
+        text: editingItem ? 'Data testimoni berhasil diperbarui.' : 'Data testimoni berhasil ditambahkan.',
+        icon: 'success',
+        confirmButtonColor: '#28a745',
+        confirmButtonText: 'OK'
+      })
       onSuccess()
     } catch (error) {
       console.error("Error saving testimonial:", error)
-      alert("Gagal menyimpan data")
+      Swal.fire({
+        title: 'Gagal!',
+        text: 'Terjadi kesalahan saat menyimpan data testimoni.',
+        icon: 'error',
+        confirmButtonColor: '#d33',
+        confirmButtonText: 'OK'
+      })
     }
   }
 
@@ -883,13 +981,14 @@ function TestimonialDialog({ isOpen, onOpenChange, editingItem, onSuccess }: any
             />
           </div>
           <div>
-            <Label htmlFor="image">URL Foto</Label>
+            <Label htmlFor="image">Unggah Foto</Label>
             <Input
               id="image"
-              value={formData.image}
-              onChange={(e) => setFormData({ ...formData, image: e.target.value })}
-              placeholder="/placeholder.svg?height=100&width=100"
+              type="file"
+              accept="image/jpeg, image/png, image/webp, image/gif, image/svg+xml"
+              onChange={(e) => setImageFile(e.target.files?.[0] || null)}
             />
+            <p className="text-sm text-gray-500 mt-1">URL yang sudah ada: {existingImageUrl || 'Belum ada'}</p>
           </div>
           <Button type="submit" className="w-full">
             {editingItem ? "Update" : "Tambah"} Testimoni
@@ -904,41 +1003,77 @@ function TestimonialDialog({ isOpen, onOpenChange, editingItem, onSuccess }: any
 function GalleryDialog({ isOpen, onOpenChange, editingItem, onSuccess }: any) {
   const [formData, setFormData] = useState({
     title: "",
-    image_url: "",
     description: "",
   })
+
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [existingImageUrl, setExistingImageUrl] = useState<string | null>(null);
 
   useEffect(() => {
     if (editingItem) {
       setFormData({
         title: editingItem.title || "",
-        image_url: editingItem.image_url || "",
         description: editingItem.description || "",
       })
+      setExistingImageUrl(editingItem.image_url || null);
     } else {
-      setFormData({
-        title: "",
-        image_url: "",
-        description: "",
-      })
+      setFormData({ title: "", description: "" })
+      setExistingImageUrl(null);
     }
-  }, [editingItem])
+    setImageFile(null);
+  }, [editingItem, isOpen])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-
     try {
+      let imageUrl = existingImageUrl;
+
+      if (imageFile) {
+        const filePath = `public/gallery/${Date.now()}-${imageFile.name}`;
+        const { error: uploadError } = await supabase.storage.from('website-assets').upload(filePath, imageFile);
+        if (uploadError) throw uploadError;
+        
+        const { data: { publicUrl } } = supabase.storage.from('website-assets').getPublicUrl(filePath);
+        imageUrl = publicUrl;
+      }
+      
+      if (!imageUrl) {
+        Swal.fire({
+          title: 'Gambar Wajib!',
+          text: 'Gambar harus diunggah untuk item galeri.',
+          icon: 'warning',
+          confirmButtonColor: '#3085d6',
+          confirmButtonText: 'OK'
+        })
+        return;
+      }
+
+      const dataToSubmit = { ...formData, image_url: imageUrl };
+
       if (editingItem) {
-        const { error } = await supabase.from("gallery").update(formData).eq("id", editingItem.id)
+        const { error } = await supabase.from("gallery").update(dataToSubmit).eq("id", editingItem.id)
         if (error) throw error
       } else {
-        const { error } = await supabase.from("gallery").insert([formData])
+        const { error } = await supabase.from("gallery").insert([dataToSubmit])
         if (error) throw error
       }
+      
+      Swal.fire({
+        title: 'Berhasil!',
+        text: editingItem ? 'Data galeri berhasil diperbarui.' : 'Data galeri berhasil ditambahkan.',
+        icon: 'success',
+        confirmButtonText: 'OK'
+      })
       onSuccess()
     } catch (error) {
       console.error("Error saving gallery item:", error)
-      alert("Gagal menyimpan data")
+      Swal.fire({
+        title: 'Gagal!',
+        text: 'Terjadi kesalahan saat menyimpan data galeri.',
+        icon: 'error',
+        confirmButtonColor: '#d33',
+        confirmButtonText: 'OK'
+      })
     }
   }
 
@@ -965,13 +1100,15 @@ function GalleryDialog({ isOpen, onOpenChange, editingItem, onSuccess }: any) {
             />
           </div>
           <div>
-            <Label htmlFor="image_url">URL Gambar</Label>
+            <Label htmlFor="image_url">Unggah Gambar</Label>
             <Input
               id="image_url"
-              value={formData.image_url}
-              onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
+              type="file"
+              accept="image/jpeg, image/png, image/webp, image/gif, image/svg+xml"
+              onChange={(e) => setImageFile(e.target.files?.[0] || null)}
               required
             />
+            <p className="text-sm text-gray-500 mt-1">URL yang sudah ada: {existingImageUrl || 'Belum ada'}</p>
           </div>
           <div>
             <Label htmlFor="description">Deskripsi</Label>
