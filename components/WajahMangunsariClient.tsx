@@ -462,7 +462,7 @@ export default function WajahMangunsariClient({ initialGardens, initialUmkm, ini
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {gardens.map((garden, index) => (
+            {filteredGardens.map((garden, index) => (
               <motion.div
                 key={garden.id}
                 initial={{ opacity: 0, y: 50 }}
@@ -597,7 +597,7 @@ export default function WajahMangunsariClient({ initialGardens, initialUmkm, ini
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {umkm.map((item, index) => (
+              {filteredUmkm.map((item, index) => (
                 <motion.div
                   key={item.id}
                   initial={{ opacity: 0, y: 50 }}
