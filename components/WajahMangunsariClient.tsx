@@ -729,7 +729,7 @@ export default function WajahMangunsariClient({ initialGardens, initialUmkm, ini
             {/* Perbaikan: Tampilkan loading jika ikon belum siap, lalu tampilkan peta jika sudah siap */}
             {leafletIcons.greenIcon && leafletIcons.yellowIcon ? (
                 <MapContainer
-                center={[-7.054, 110.378]}
+                center={[-7.085549707349013, 110.3810602729464]}
                 zoom={16}
                 style={{ height: "100%", width: "100%" }}
                 className="rounded-2xl"
