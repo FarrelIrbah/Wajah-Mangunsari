@@ -283,7 +283,7 @@ export default function WajahMangunsariClient({ initialGardens, initialUmkm, ini
       <section className="relative h-screen flex items-center justify-center overflow-hidden">
         <motion.div style={{ y: heroY }} className="absolute inset-0 z-0">
           <Image
-            src="/placeholder.svg?height=1080&width=1920"
+            src="https://kampungkb.bkkbn.go.id/storage/33/3374/337412/3374121002/44503/gambar.jpeg"
             alt="Mangunsari Village"
             fill
             className="object-cover"
@@ -411,7 +411,7 @@ export default function WajahMangunsariClient({ initialGardens, initialUmkm, ini
               className="relative"
             >
               <Image
-                src="/placeholder.svg?height=500&width=600"
+                src="/WhatsApp Image 2025-08-06 at 10.06.27_53e1790e.jpg"
                 alt="Kegiatan Lingkungan Mangunsari"
                 width={600}
                 height={500}
